@@ -7,7 +7,7 @@ using namespace std;
 //∇ ∈ ∝ ∧ ∨ ～ ∫ ≠ ≤ ≥ ≈ ∞ π
 //α β γ δ ε ζ η θ ι κ λ μ ν
 //∈ ∏ ∑ ∕ √ ∝ ∞ ∟ ∠ ∣ ∥ ∧ ∨ ∩ ∪ ∫ ∮ ÷ × ± 
-// ∬ ∭ ∯ ∰ ∲ ∂ △ ψ
+// ∬ ∭ ∯ ∰ ∲ ∂ △ ψ Δφ ΔW
 //º¹²³⁴ⁿ
 
 namespace Methods
@@ -53,7 +53,7 @@ namespace Methods
 	{
 		Formula Res;
 		Res.symbol  = "Min";
-		Res.formula = "∂("+Form.formula+")/θ=0";
+		Res.formula = "∂("+Form.nick+")/θ=0";
 		Res.nick    = "argmin("+Form.symbol+")";
 		Res.expand_formula = "∂("+Form.formula+")/θ=0";
 		return Res;
@@ -63,7 +63,7 @@ namespace Methods
 	{
 		Formula Res;
 		Res.symbol  = "Min";
-		Res.formula = "∂("+Form.formula+")/θ=0";
+		Res.formula = "∂("+Form.nick+")/θ=0";
 		Res.nick    = "argmin("+Form.symbol+")";
 		Res.expand_formula = "∂("+Form.formula+")/θ=0";
 		return Res;
