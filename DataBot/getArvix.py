@@ -22,6 +22,7 @@ def save_html_to_local(url,name):
     contents = spider.url_get(url,"utf-8")
     save(name,str(contents))   
 
+
 #-----------------get urls of searched paper-------------------------------
 def get_urls_of_searched_paper(words):
     #http://xueshu.baidu.com/s?wd=machine+learning&rsv_bp=0&tn=SE_baiduxueshu_c1gjeupa&rsv_spt=3&ie=utf-8&f=3&rsv_sug2=1&sc_f_para=sc_tasktype%3D%7BfirstSimpleSearch%7D&rsp=0
@@ -66,5 +67,5 @@ def test_get(url):
 if __name__ == '__main__':
     #TEST_urls_of_searched_paper()    
     #save_html_to_local(get_abstract(spider.url_get('https://arxiv.org/abs/1712.09478',"utf-8").replace("\n", " ")),'ab.txt')
-    save('ab.txt',get_abstract(spider.url_get('https://arxiv.org/abs/1712.09478',"utf-8").replace("\n", " ")))
+    save('500.html',spider.url_get('http://odds.500.com/fenxi/ouzhi-642942.shtml',"gb2312"))
     #test_get('https://arxiv.org/abs/1712.09478')
