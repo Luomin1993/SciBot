@@ -9,6 +9,7 @@ Created on Wed Apr 04 22:02:19 2018
 #include <iostream>
 #include <vector>
 #include <map>
+#include "tree.hpp"
 
 #define MAX_USE_SYM 100
 
@@ -301,6 +302,47 @@ Node* devide(Node* s1,Node* s2)
 //mapStudent.insert(map<int, string>::value_type (1, "student_one"));
 //namespace method
 static std::map<Node*,Node*> Methods;
+
+
+
+
+
+
+
+//-------------------------------------
+//
+//the formula generator function;
+//
+//-------------------------------------
+//
+//map_turples(Node* real_tree,Node* template_tree,map<Node*,Node*>& turpleMap):  
+//   find the one-one turple in the real tree and the template tree; 
+//
+//replace(Node* real_tree,Node* template_tree,const map<Node*,Node*> turpleMap):
+//   do replace one-one turple on the second tree;   
+//
+//compare(Node* real_tree,Node* template_tree):
+//   find if the template_tree is the sub-tree of the real_tree,and from where(Start) they are the same;
+//
+//
+
+
+//deduce process: let state_1 do action like : template_state_1 ----> template_state_2;
+//
+Node* do_deduce(Node* state_1,const Node* template_state_1,const Node* template_state_2)
+{}
+
+
+typedef std::vector<Node*> deduce_chain;
+
+void make_deduce_chain(deduce_chain& Chain_to_make,const deduce_chain Chain_template)
+{}
+
+
+
+
+
+
 
 void signin(std::map<Node*,Node*>& Methods)
 {
