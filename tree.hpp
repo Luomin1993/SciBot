@@ -216,7 +216,7 @@ void replaceThatNode(Node* RootMain,
 //
 Node* makeCopyTree(Node* originTree)
 {
-	if (originTree!=NULL && originTree->type!="Sym"&& originTree->type!="Num")
+	/*if (originTree!=NULL && originTree->type!="Sym"&& originTree->type!="Num")
 	{
 		static std::vector<Node*> CopyNodesStack;
 		Node* move = originTree;
@@ -237,5 +237,57 @@ Node* makeCopyTree(Node* originTree)
 		CopyNodesStack.push_back(new Node(originTree->type,originTree->symbol,originTree->expression,0));
 		return CopyNodesStack[CopyNodesStack.size()-1];
 	}
-	return NULL;
+	return NULL;*/
+
+	//first: we do BFS on a tree's nodes into a queue;(and a StaticStack)
+	//second: make a empty queue to help reconstruct the copy tree;
+	if (originTree==NULL)
+	{
+		return NULL;
+	}
+	queue<Node*> firstQueue;
+	queue<Node*>  helpQueue;
+	static std::vector<Node*> CopyNodesStack;
+	Node* move = originTree;
+
+	//BFS
+	if(CopyNodesStack.size()==0) //this is root node;
+	{
+		CopyNodesStack.push_back(new Node(move->type,move->symbol,move->expression,move->subNodeNum));
+		firstQueue.push(CopyNodesStack[0]);
+	}
+	while(!firstQueue.empty())
+	{
+	    move = firstQueue.front();
+	    if (move->subNodeNum==0)
+	    {
+	    	continue;
+	    }
+	    for(int i = 0; i < move->subNodeNum; ++i)
+	    {
+	    	CopyNodesStack.push_back(new Node(move->SubNodes[i]->type,move->SubNodes[i]->symbol,move->SubNodes[i]->expression,move->SubNodes[i]->subNodeNum));
+	    	firstQueue.push_back(CopyNodesStack[CopyNodesStack.size()-1]);
+	    }
+	    firstQueue.pop();
+	}    
+
+    //second step:use two queue to link the tree nodes;
+    for (int i = 0; i < CopyNodesStack.size(); ++i)
+    {
+    	firstQueue.push(CopyNodesStack[i]);
+    }
+    helpQueue.push(firstQueue.front());
+    while(!firstQueue.empty())
+    {
+    	int numOfThisRoot = helpQueue.front()->subNodeNum;
+    	while(numOfThisRoot)
+    	{
+    		helpQueue.front()->SubNodes.push_back(firstQueue->front());
+    		helpQueue.push(firstQueue.front());
+    		firstQueue.pop();
+    		numOfThisRoot--;
+    	}
+    	helpQueue.pop();
+    }
+    return CopyNodesStack[0];
 }
