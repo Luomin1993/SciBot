@@ -47,8 +47,10 @@ Node* make_copy( Node* chain)
 		}
 		i++;
 		move = move->next;
-	} 
+	}
+	//cout<<"static Stack Size: "<<vec.size()<<endl; 
 	return vec[0];
+
 }
 
 Node Test_make_copy(Node* chain)
@@ -84,6 +86,7 @@ Node* make_chain(std::vector<int> value_vec)
 		}
 	}
 	//return chain;
+	cout<<"static Stack Size: "<<dynamic_nodes.size()<<endl; 
 	return dynamic_nodes[0];
 }
 
@@ -92,9 +95,10 @@ int main(int argc, char const *argv[])
 	std::vector<int> value_vec;
 	value_vec.push_back(1);value_vec.push_back(2);value_vec.push_back(3);value_vec.push_back(4);value_vec.push_back(5);
 	Node* chain = make_chain(value_vec);
+	Node* chain2= make_chain(value_vec);
 	//print_chain(chain);
 	//Node* new_chain = new_chain_and_change(chain);
 	//print_chain(new_chain);
-	Test_make_copy(chain);
+	//Test_make_copy(chain);
 	return 0;
 }

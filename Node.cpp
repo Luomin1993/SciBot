@@ -55,15 +55,26 @@ public:
 
 
 */
-
+//--------------------------------------------------------------------------------------------
+//------------------------------                             ---------------------------------
 //------------------------------  Using functions to realize ---------------------------------
+//------------------------------                             ---------------------------------
+//--------------------------------------------------------------------------------------------
 struct Node
 {
 	string type;
 	string symbol;
 	string expression;
 	vector<Node*> SubNodes;
+	int subNodeNum;
 	//Node(string exp){expression = exp;}
+	Node(string typ,string sym,string exp,int subnn)
+	{
+		type       =    typ;
+		expression =    exp;
+		sym        = symbol;
+		subNodeNum =  subnn;
+	}
 };
 
 /*struct Node Sym;
@@ -125,6 +136,8 @@ Node* add(Node* s1,Node* s2)
 		int last = add_stack.size()-1;
 		add_stack[last]->SubNodes.push_back(s1);
 		add_stack[last]->SubNodes.push_back(s2);
+		add_stack[last]->symbol     = "+";
+		add_stack[last]->subNodeNum = add_stack[last]->SubNodes.size();
 		add_stack[last]->expression = "("+s1->expression+"+"+s2->expression+")";
 		return add_stack[last];
 	}
