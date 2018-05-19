@@ -1,0 +1,592 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
+\usepackage{float} %% Package for Float
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage[thmmarks,amsmath]{ntheorem} %% If amsmath is applied,then amsma is necessary
+\usepackage{bm} %% Bold Mathematical Symbols
+\usepackage[colorlinks,linkcolor=cyan,citecolor=cyan]{hyperref}
+%\usepackage{extarrows}
+\usepackage[hang,flushmargin]{footmisc} %% Let the footnote not indentation
+\usepackage[square,comma,sort&compress,numbers]{natbib} %% Sort of References
+\usepackage{mathrsfs} %% Swash letter
+\usepackage[font=footnotesize,skip=0pt,textfont=rm,labelfont=rm]{caption,subcaption} 
+%% Format of Caption for Tab.and Fig.
+\usepackage{booktabs} %% tables with three lines
+\usepackage{tocloft}
+%\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}  
+\usepackage{algorithmicx}  
+\usepackage{algpseudocode}
+\usepackage[UTF8, scheme = plain]{ctex}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\begin{document}
+%
+\title{Formula Automatic Derivation Machine}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{MinZhong Luo\inst{1}\orcidID{0000-1111-2222-3333} \and
+Li Liu\inst{2,3}\orcidID{1111-2222-3333-4444}}
+%
+\authorrunning{F. Author et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{Princeton University, Princeton NJ 08544, USA \and
+Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
+\email{lncs@springer.com}\\
+\url{http://www.springer.com/gp/computer-science/lncs} \and
+ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
+\email{\{abc,lncs\}@uni-heidelberg.de}}
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+公式自动推导是AI在科研某个特定领域的一种革命性应用，通过将公式的结构抽象为可推演的数据结构，设定目标进行推导。本文所做的机器自动公式推导是指在各专业领域（比如材料学、计算力学等）利用AI方法做自动的相关公式复杂推算，以获得有价值的演算结果和解法。
+
+\keywords{Automatic derivation  \and Formula multiway tree \and Encoding algorithm.}
+\end{abstract}
+%
+%
+%
+\section{简介}
+公式自动推导是AI在科研某个特定领域的一种革命性应用，通过将公式的结构抽象为可推演的数据结构，设定目标进行推导。此前并没有进行公式推导的相关AI方法的研究，但“自动机器证明”\cite{ref_article1} 是和公式推导比较相近的研究，自动机器证明是指用将证明型问题转化为计算机可计算的形式，比如多项式 \cite{ref_article1}，然后进行推算的方法。自动证明是自动公式推导的一种特殊形式，由于要求计算简单，机器证明一般只涉及简单的几何问题\cite{ref_article1}。
+
+The automatic derivation of formulas is a revolutionary application of AI in a particular field of research.  By abstracting the structure of a formula into a deducible data structure, the goal can be deduced. Previously there has been no study of formula-derived AI methods, but "automatic machine proof" \cite{ref_article1} is a study that is similar to formula derivation. Automatic machine proof refers to the method which transforms proof-type problems into computer-computable forms, such as polynomials \cite{ref_article1}, and then calculating it. Automatic proof is a special form of automatic formula derivation. Due to the requirement of simple calculation, machine proof generally involves only simple geometric problems \cite{ref_article1}.
+
+本文所做的机器自动公式推导是指在各专业领域（比如材料学、计算力学等）利用AI方法做自动的相关公式复杂推算，以获得有价值的演算结果和解法,对于传统科研具有革命性意义。
+
+The automatic formula derivation in this paper refers to the use of the AI method in various professional fields (such as materials science, computational mechanics, etc.) to make complex calculations of relevant formulas automatically to obtain valuable calculation results and solutions, which is revolutionary for traditional scientific research.
+
+首先我们将公式表达为多叉树模型，称为公式多叉树；在公式多叉树里，每个非叶节点都是操作符号(比如$=$,$+$,$exp(.)$等)，而叶节点都是代数符号和数值符号(比如$x$,$e^{-2.337}$,$\pi$等)。通过设计公式多叉树的子树匹配算法、构造算法、替换算法等，可以对公式进行推导变形。公式多叉树的子树匹配算法和替换算法使公式多叉树可以按照某种模版来变形，这使复杂的公式可以按照简单的公式多叉树的变形方法进行变形，而这种变形模式又适用于更复杂的公式，这称之为自动公式推导的迭代学习。
+
+First, we re-express the formula as a multiway tree model, which is called a formula multiway tree. In the formula multiway tree, each non-leaf node is an operation symbol (for example, $=$, $+$, $exp(.)$ Etc), while leaf nodes are algebraic and numeric symbol (eg $x$, $e^{-2.337}$, $\pi$, etc.). By devising the subtree matching algorithm,tree construction algorithm,subtree replacement algorithm of the formula, the formula can be deduced or transformed. The subtree matching algorithm and replacement algorithm of the formula multiway tree can make the formula multiway tree deform according to a certain template, which makes the complex formula can be deformed according to the simple formula multiway tree deformation method, and this deformation mode can be used for more complex formulae, which is called iterative learning for automatic formula derivation.
+
+我们设计了公式多叉树的编码算法，可以将不同的公式转化为统一维度的特征向量，建立公式的特征空间。公式多项式的特征编码使（1）每个公式有唯一的标识，（2）可以度量公式的相似度，相似的公式多项式的空间距离更小。（3）可以作为特征向量来训练学习器。
+
+We have designed the encoding algorithm for the formula multiway tree, which can transform different formulas into feature vectors in a unified dimension and establish the feature space of the formulas. The eigencoding of the formula multiway tree makes: 
+(1) each formula has a unique identity;
+(2) we can measure the similarity of the formulas. The similar formula multiway trees have a smaller spatial distance;
+(3) the feature vectors can be used to train the learner.
+
+我们使用强化学习的机制来训练公式推导器。为一个具体的专业问题（比如理论力学中的计算），我们需要准备相关的推导训练集，将可选择的公式多项式变形方法设为行动集合${a_i}$，将公式在不同阶段的表达式设为状态集合${s_i}$，通过建立神经网络模型$\pi_{\theta}(a|s)$，采用梯度下降法来优化模型参数。
+
+We use the reinforcement learning mechanism to train the formula derivation machine. For a specific professional problem (such as calculation in theoretical mechanics), we need to prepare the relevant derivation training set, set the optional formula multiway tree transformation method to the action set ${a_i}$, and set expressions for formulas at different stages to state set ${s_i}$, and use the gradient descent method to optimize the model parameters by establishing the neural network model $\pi_{\theta}(a|s)$.
+
+公式的自动推导主要有两个难点，（1）公式本身是高度抽象的数学语言，不能像机器学习的其他训练数据一样直接计算。（2）每个领域的基础公式都很多，人为标注对人的专业要求很高。针对第一个难点，公式多叉树可以把公式分解到算符级别，可以包含了公式的所有信息，其编码也可以作为训练数据输入学习器。针对第二点，可以通过模版映射机制和迭代学习模式，只人为标注尽可能少的基础公式，使自动推导机根据低阶简单公式模版自动推导更高阶的复杂公式。
+
+There are two main difficulties in the automatic derivation of formulas.(1) The formula itself is a highly abstract mathematical language and cannot be directly calculated like other training data for machine learning. (2) There are many basic formulas in each professional field. Man-made annotations have high professional requirements for people. For the first difficulty, the formula multiway tree can decompose the formula to the calculation-symbol level, can contain all the information of a formula, and its encoding can also be used as a training data to input learner. For the second difficulty, we can use the template mapping mechanism and iterative learning mode to artificially label as few basic formulas as possible, so that the automatic derivation machine automatically derives higher-order complex formulas based on low-order simple formula templates.
+
+人工智能方法不应该只关注服务行业的推荐或自动识别等任务，也应该多用于更具有意义的科研领域。通过建立公式自动推导机，我们可以高效获得有意义的结果。在本文的案例中,通过构造一阶线性微分方程训练集，训练神经网络模型$\pi_{\theta}(a|s)$，使之成功推导出了反应堆物理中$Pm^{149}$的裂变浓度方程解。按照本文的公式的自动推导机设计原理，可以解决更多的复杂的专业性科研问题。
+
+Artificial intelligence methods should not only focus on tasks such as recommendation or automatic identification in the service industry, but should also be used in more meaningful research areas. By establishing the formula automatic derivation machine, we can efficiently obtain meaningful results. In the case of this paper, the neural network model $\pi_{\theta}(a|s)$ is trained by constructing a first-order linear differential equation training set, which successfully derives the fission concentration equation solution of $Pm^{149}$ in reactor physics. In accordance with the formula automatic derivation machine design principle of this paper, more complex professional scientific research problems can be solved.
+
+
+
+
+
+
+% \section{First Section}
+% \subsection{A Subsection Sample}
+% Please note that the first paragraph of a section or subsection is
+% not indented. The first paragraph that follows a table, figure,
+% equation etc. does not need an indent, either.
+
+% Subsequent paragraphs, however, are indented.
+
+% \subsubsection{Sample Heading (Third Level)} Only two levels of
+% headings should be numbered. Lower level headings remain unnumbered;
+% they are formatted as run-in headings.
+
+
+
+\section{formula multiway tree}
+\subsection{multiway tree model}
+在对数学公式的推导研究中，为了使公式能被计算机计算，必须将公式表达为可计算操作的形式。在机器证明的研究中，很多几何问题的证明被表达为相关的多项式\cite{ref_proc1}，齐次微分方程也可以映射为多项式来计算，比如：
+
+In the derivation of mathematical formulas, in order for the formula to be computed by a computer, the formula must be re-expressed in a computable form. In the research of machine proof, the proof of many geometric problems is re-expressed as the related polynomial \cite{ref_proc1}, and the homogeneous differential equation can also be mapped as a polynomial to calculate, for example:
+
+$$ay'''+by''+cy'+d=y \Rightarrow ay^3+by^2+cy^1+d=y^0$$
+
+但是传统的多项式表达具有很大的局限性，比如如果想用多项式表达成分复杂的公式就不可行，例如这样的公式：
+
+However, the traditional polynomial expression has great limitations. For example, if you want to use a polynomial to express a complicated formula, it is not feasible. For example, such as this formula:
+
+$$\int{ydx}+sin(y/x)+S(x)=0$$
+
+因此本文提出了公式多叉树来重新表达公式。公式多叉树按照计算符号优先级自顶向下构造，以计算符号为节点，以代数符号和数值符号为叶节点，使得任何复杂的公式都可以用多叉树的形式分解并表达。
+
+Therefore, the formula multiway tree is proposed to re-express the formula. The formula multiway tree is constructed from top to bottom according to the symbol priority. The computational symbol is a node, and the algebraic symbols and numerical symbols are leaf nodes, so that any complex formulas can be decomposed and re-expressed in the form of a multiway tree.
+
+公式用多叉树来重新表达，可以使公式推导过程建立在多叉树的操作和变换算法上，使得推导过程中，公式的结构和数学内涵严格遵从推导规则，消除了误差和歧义性，也容易用编程语言实现。
+
+The formula is re-expressed with a multiway tree, and the formula derivation process can be based on the operation and transformation algorithm of the multiway tree. In the derivation process, the structure and mathematical connotation of the formula follow the derivation rules strictly, eliminating errors and ambiguities, which is also easy to implement in programming languages.
+
+例如，需要表达如下公式时，其对应的公式二叉树如图1所示。
+
+For example, if the following formula needs to be expressed,the corresponding multiway tree of the formula is shown in FIG.1.
+
+$$\delta = \int \frac{\bar{M_i}\bar{M_j}}{EI}dx $$
+$$P(x,y,z,t)=dE/dS$$
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.38]{tree.jpg}
+\caption{用多叉树表达公式。每一个算符都是节点，属于这个算符运算范围的代数符号或者其他算符属于这个算符的子节点。代数符号节点和数值节点都是叶节点，叶节点也必然是代数符号节点或数值节点。}
+\caption{Using a multiway tree to express the formula, each operator is a node, and algebraic symbols or other operators that belong to this operator's scope of operation belong to this node's child nodes. Algebraic symbol nodes and numerical nodes can only be leaf nodes.}
+\end{figure}
+
+\subsection{Subtree search algorithm}
+为了完成后续的迭代学习功能，我们提出公式多叉树的子树查找算法。子树查找算法是指给定公式多叉树$F$(比如$sin^2(x)+cos^2(x)=1$)和一个简单的模板公式$T$(比如$a+b=c$)，判定公式$F$是否符号模板公式$T$的模式，也就是$F$的公式多叉树是否包含子树$T$。
+
+In order to complete the function of iterative learning, we propose the subtree search algorithm of the formula multiway tree. The subtree search algorithm refers to when given formula multiway tree $F$ (such as $sin^2(x)+cos^2(x)=1$) and a simple template formula $T$ (such as $a+b =c$), judging whether the formula $F$ conforms to the template formula $T$, that is, whether the formula multiway tree of $F$ contains the subtree $T$.
+
+这种查找算法是基于递归实现的，具体来说，从$F$的公式多叉树的根节点开始匹配子树$T$，如果符号相同，就开始比较他们的子节点，如果符号不相同，则开始递归地从$F$的子节点又开始匹配。具体算法如下:
+
+The search algorithm is based on recursive implementation. Specifically, the subtree $T$ is matched from the root of the $F$ formula multitree, and if their symbols are the same, their child nodes would be compared, if their symbols are not the same,then start matching from the child nodes of $F$ recursively. The specific algorithm is as follows:
+
+\begin{algorithm}[t]
+\caption{subtree search algorithm $find(root,sub)$} %算法的名字
+\hspace*{0.02in} {\bf Input: Specific formula root node $root$; root node of the formula subtree $sub$;Specific node matching function $TreeHasSub(root,sub)$} 
+\hspace*{0.02in} {\bf Output:if the template formula $sub$ is the subtree of $root$} 
+\begin{algorithmic}[1]
+\If{their symbols are the same: root.sym=sub.sym}
+    \If{$TreeHasSub(root,sub)$} 
+        return true;
+    \EndIf
+\EndIf
+\For{$node$ in $root.subNodes$} % While语句，需要和EndWhile对应
+　　\State return find(node,sub);
+\EndFor
+\State return result
+\end{algorithmic}
+\end{algorithm}
+
+
+比如下面的第一个公式中推导前的公式是第二个公式中推导前的子树，公式2可以按照公式1的推导模式推导，这也是本文后面提出的的模板映射法。
+
+For example, the formula $dy=adx$ before derivation below is the subtree of the formula $df(x)=sinxdx$ before derivation, and the formula $f(x)=\int{sinxdx}$ can be deduced according to the derivation pattern of $dy=adx \Rightarrow y=\int{adx}$, which is also called the template mapping method proposed later in this paper.
+
+$$dy=adx \Rightarrow y=\int{adx} $$
+$$df(x)=sinxdx \Rightarrow f(x)=\int{sinxdx} $$
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.38]{find_tree.jpg}
+\caption{将式12作为子树，在各种具体的公式里执行查找算法查找是否包含这个子树。比如式13包含这个子树。这等价于，它是这个模板公式的一种具体情形。}
+\caption{Using formula $dy=adx$ as a subtree, performing subtree search algorithm in other formulas to find out if this subtree is included. For example, formula $df(x)=sinxdx$ contains this subtree, which is equivalent to, $df(x)=sinxdx$ is a specific case of the template formula $dy=adx$.}
+\end{figure}
+
+
+
+\subsection{Construct declaration method}
+因为后期我们需要人工构建大量的基础公式，所以在声明具体的公式多叉树时，需要一种符合人思维的高效声明方法，因此我们提出多叉树构造方法。在这里，我们只需要用编程语句(本文使用的c++语言)使用构造函数按照公式构造声明即可，构造函数会返回一个公式的实例(本文的程序中是返回某个公式多叉树的根节点指针)。比如我们声明如下公式：
+
+Because we need to manually build a large number of basic formulas for training in the later period,so when declaring a specific multiway tree for a formula, we need an efficient declaration method that meets people's thinking. Therefore, we propose a a multiway  tree construction method. Here, we only need to use a construct function in the programming language(C++ language is used in this article)to do the declaration of a formula. The construct function returns an instance of a formula multiway tree(in this article, the program returns the c++ point of the root node of a formula multiway tree). For example, we declare the following formula:
+
+$$df(x)=sinxdx \Rightarrow$$
+$$Equal(Der(f(Sym("x"))), Times(Sin(Sym("x")),Der(Sym("x"))))$$
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.38]{express.jpg}
+\caption{基于多叉树的公式表达，也适合使用代码表述。每一个算符被抽象为一个函数式的表达，这允许自顶向下地使用代码方便地表达任意复杂的公式。}
+\caption{Expressions based on multiway trees are also suitable for using code expressions. Each operator is abstracted as a functional expression, which allows top-down use of code to express arbitrarily complex formulas easily.}
+\end{figure}
+
+
+
+
+
+
+
+
+
+\section{Formula derivation implementation}
+%-----------------------
+%------  3-1     -------
+%-----------------------
+\subsection{Template mapping method}
+我们提出模板映射法，使公式可以由当前状态向下一步的推导，具体的，比如公式$e^xsinx=m(x)t$的一步推导：
+
+We propose the template mapping method that allows the formula to be deduced from the current state to the next step. Specifically, for example, a one-step derivation of the formula $e^xsinx=m(x)t$:
+
+$$e^xsinx=m(x)t \Rightarrow e^xsinx/t=m(x)$$
+
+可以看做是按照模板公式$a=bc \Rightarrow a/c=b$的推导模式来完成的。公式$e^xsinx=m(x)t$首先判断是否包含子树$a=bc$，然后可以通过模板映射$a=bc \Rightarrow a/c=b$完成自身的推导$e^xsinx=m(x)t \Rightarrow e^xsinx/t=m(x)$。
+
+This can be seen as done according to the template formula $a=bc \Rightarrow a/c=b$. First,he formula $e^xsinx=m(x)t$ judges if the subtree $a=bc$ is included, and then the template $a=bc\Rightarrow a/c=b$ can be used to complete its derivation: $e^xsinx= m(x)t \Rightarrow e^xsinx/t=m(x)$.
+
+%-----------------------
+%------  3-2     -------
+%-----------------------
+\subsection{Derivation by template mapping method}
+模板映射可以看做是具体推导步骤的抽象，它描述的是模板公式$T_1$变换到模板公式$T_2$的变换方法，而模板公式描述的是符合这种推导模式的最简单的公式多叉树形式。模板映射可以描述为：
+
+Template mapping can be seen as an abstraction of the specific derivation steps. It describes the transformation of the template formula $T_1$ to the template formula $T_2$, and the template formula describes the simplest formula multiway tree that conforms to this derivation pattern. The template map can be described as:
+
+$$M(T_1)=T_2$$
+
+其中$M(.)$代表某种推导变换，$T_1$代表被推导的模板公式，$T_2$代表推导完毕的模板公式。比如加减变换可以描述为：
+
+Where $M(.)$ represents some kind of derived transformation, $T_1$ represents the template formula before derivation, and $T_2$ represents the template formula after derivation. For example, addition and subtraction can be described as:
+
+$$a+b=c \Rightarrow a=c-b $$
+$$M(tree(a+b=c)) = tree(a=c-b) $$
+
+任意的公式推导可以依赖最基础的模板映射来完成，也就是公式$F_1$的推导可以按照$T_1 \Rightarrow T_2$的模式来完成一步推导。这种依赖模板映射的推导方法可以表示为$Trans(F_1,T_1,T_2)=Trans(F_1,T_1,M(T_1))=F_2$，比如对于公式$m(x)+s(y)=T(x,y)$，要按照模板映射$a+b=c \Rightarrow a=c-b $的方式进行变换，那就是：
+
+Any formula derivation can be done based on the most basic template mapping. That is, the derivation of the formula $F_1$ can be performed in a one-step derivation according to the mode of $T_1 \Rightarrow T_2$. This derivation method that depends on the template mapping can be expressed as $Trans(F_1,T_1,T_2)=Trans(F_1,T_1,M(T_1))=F_2$.  such as, for the formula $m(x)+s(y)= T(x,y)$, according to the template mapping $a+b=c \Rightarrow a=cb $, the transformation is:
+
+$$m(x)+s(y)=T(x,y) \Rightarrow m(x)=T(x,y)-s(y)$$
+$$Trans(tree(m(x)+s(y)=T(x,y)),tree(a+b=c),tree(a=c-b))=tree(m(x)=T(x,y)-s(y))$$
+
+这种方法比较难解决类似$\oint{\frac{m}{p}dx} \Rightarrow \oint{\frac{dx}{v}}$这种具有物理内涵的隐式变换。这种问题的解决方法是将其分解为几步来完成，并且需要加入辅助符号来完成，具体地：
+
+This method is difficult to solve the implicit conversion with physical connotation like $\oint{\frac{m}{p}dx}\Rightarrow \oint{\frac{dx}{v}}$. The solution to this problem is to break it down into several steps to complete, and need to add auxiliary symbols to complete, specifically:
+
+$$\oint{\frac{m}{p}dx}=S \Rightarrow \oint{dx}=S\frac{p}{m} \Rightarrow \oint{dx}=Sv \Rightarrow \oint{\frac{dx}{v}}=S$$
+$ab/c=d \Rightarrow a=dc/b$ $v=p/m$  $ab/c=d \Rightarrow a=dc/b$
+
+
+%-----------------------
+%------  3-3     -------
+%-----------------------
+\subsection{Formula multiway tree replacement algorithm}
+为了实现按模板映射进行推导的功能，我们提出公式多叉树的替换算法。在公式$F_1$判定模板公式$T_1$是其子树后，可以在模板公式$T_2$上执行公式$F_1$和模板公式$T_1$对应节点的替换算法（这一步相当于数学运算中的代入公式进行计算），最终替换完毕的公式$T_2$也就是推导的结果$T_2$。具体算法是：
+
+In order to implement the function of deducing by template mapping, we propose the replacement algorithm of the formula multiway tree. After the formula $F_1$ finds that the template formula $T_1$ is its subtree, the replacement algorithm for the corresponding node of the formula $F_1$ and the template formula $T_1$ can be performed on the template formula $T_2$ (this step is equivalent to the one in the mathematical operation: substituting another formula into the formula for calculation.), the final replaced formula $T_2$ is the deduced result $T_2$. The specific algorithm is:
+
+\begin{algorithm}[t]
+\caption{Replacement algorithm $Replace(root,sub1,sub2)$} %算法的名字
+\hspace*{0.02in} {\bf Input: Specific Formula A and the node $root$ that coincides with the root node of $sub1$; Template formula $sub1$ that matches formula A;Template formula $sub2$ to be transformed.} 
+\hspace*{0.02in} {\bf Output:Derived result formula $sub_{copy}$} 
+\begin{algorithmic}[1]
+\State construct $Map = makeMap(root,sub1)$ ,find the part of the formula that corresponds to each symbol in the template formula.
+\State construct $sub_{copy}$,as a copy of $sub2$.
+\For{Traverse every corresponding node in $Map$} % While语句，需要和EndWhile对应
+　　\State Replace the corresponding node on $sub_{copy}$ with the corresponding specific part of the formula;
+\EndFor
+\State return $sub_{copy}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{replace.jpg}
+\caption{替换算法，第一步：在对应模式的键子树$sub1$上查找具体公式的对应节点，并构建它们之间的映射。第二步：在值子树副本$sub2_{copy}$遍历这个映射并实施替换。第三步：将这个值子树副本$sub2_{copy}$挂载回原式，完成一次推导。}
+\caption{Replace algorithm.Step 1: find the corresponding nodes of the specific formula on the subtree $sub1$ of the corresponding mode, and build the mapping relationship between them. Step 2: traverse this map and implement the replacement on the $sub2_{copy}$. Step 3: mount the $sub2_{copy}$ back to the original tree and complete a one-step derivation.}
+\end{figure}
+
+
+以模板映射为基础，我们提出迭代学习，迭代学习机制是指给定初始的基础公式推导模板$T_0=(t_01,t_02)$，$T_0$是足够简单的公式变换，而$T_1=(t_11,t_12)$是根据$T_0$或包含$T_0$的多个同级别的映射模板推导的公式，这样一直进行，$T_{n-1}$可以得出更复杂的公式变换方法$T_{n}$。这样的建立在迭代变换上的公式推导方式称为迭代学习。
+
+Based on the template mapping, we propose iterative learning. The iterative learning mechanism refers to the initial basic formula derivation template $T_0=(t_01,t_02)$, where $T_0$ is a simple enough formula transformation, and $T_1=(t_11 ,t_12)$ is a formula derived from $T_0$ or a number of map templates of the same class containing $T_0$. By the mechanism like this, $T_{n-1}$ can lead to a more complex formula transformation method $T_{n}$. Such formula derivation based on iterative transformation is called iterative learning.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{iterator_learn.jpg}
+\caption{使用基础的模板推导公式，将得出的公式继续当做模板用于推导，称为迭代学习。迭代学习可以从最简单的公式变换模式开始得到足够复杂的公式结果。}
+\caption{Using the basic template derivation formulas, the derived formulas continue to be used as templates for derivation, which is called iterative learning. Iterative learning can lead to complex formulas starting from the simplest formulas transformation.}
+\end{figure}
+
+
+
+
+
+\section{公式多叉树的编码}
+
+%-----------------------
+%------  4-1     -------
+%-----------------------
+\subsection{特征编码的好处}
+虽然公式多叉树可以通过查找子树和替换算法来实现推断，但是使用多叉树表达的公式无法直接输入学习器来进行训练拟合、误差度量。当我们需要度量如下两个公式的相似程度时，树模型很不直观：
+
+$$te^x+mcosx$$
+$$te^{-x}-asinx$$
+
+所以我们提出编码算法对公式多叉树进行特征编码，将公式多叉树转化为对应的特征向量，这样做有三个好处：
+
+1)每个公式有唯一的标识。
+
+2)可以度量公式的相似度，相似的公式多项式的空间距离更小。
+
+3)可以作为特征向量来训练学习器。
+
+%-----------------------
+%------  4-2     -------
+%-----------------------
+\subsection{编码方式}
+具体的编码方式是，对每一个会出现的算符都分配一个整数标签，自顶向下以广度优先遍历公式多叉树，将其节点和子节点的整数编码加入特征向量。具体流程如下：
+
+
+\begin{algorithm}[t]
+\caption{公式多叉树编码算法} %算法的名字
+\hspace*{0.02in} {\bf Input:具体的待编码公式根节点$root$; } 
+\hspace*{0.02in} {\bf Globle:最大编码长度$L_{max}$;全局编码序列$V$;各节点全局编码集合${N_i}$ }
+\hspace*{0.02in} {\bf Output:编码序列$V$} 
+\begin{algorithmic}[1]
+\State $encode(root)$
+\State 检验$L_V<L_{max}$
+\State 清空临时序列$S$:$S=[]$;
+\State 在临时序列尾部插入根节点编码：$S.push(N_{root})$
+\State \For $node \in root.SubNodes$:$S.push(N_{node})$\EndFor
+\State $V.push(S)$;
+\State \For $node \in root.SubNodes$:if $node.type$ is not "Sym":$encode(node)$;\EndFor
+\State 最终在$V$后补全$L_{max}-L_{V}$个0；
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.38]{encode_1.jpg}
+\caption{多叉树的编码算法，是自顶向下的广度优先算法，首先给所有符号分配整数编码。代数符号和数值符号的编码都是0。然后按层进行自左向右的编码。}
+\end{figure}
+
+
+%-----------------------
+%------  4-3     -------
+%-----------------------
+\subsection{差异度量}
+得到两个公式多叉树的特征向量后，需要定义度量它们之间差异$dis(tree_1,tree_2)$的计算方法，首先我们已经保证了所有特征向量是等维度的，然后对每一位进行对比，不相等则对比结果为1，相等则对比结果为0，最后累加对比结果，就是两个公式的差异值。比如对于公式4-1的差异值计算：
+
+$$dis(tree(te^x+mcosx),tree(te^{-x}-asinx))$$
+$$=dis([4,3,3,3,0,2,3,0,1,2,0,1,0],[5,3,3,3,0,2,3,0,6,2,3,6,0,3,0,0])$$
+$$=4$$
+
+
+定义公式多叉树的编码方法和差异值计算方法对于后续的学习器的训练和预测功能具有重大意义，编码方法可以提取公式多叉树的特征，将其转换为可使用线性代数方法计算的特征向量，而差异值计算方法可用来完成模型的误差收敛方法。
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.38]{encode_2.jpg}
+\caption{式41的多叉树的编码。}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{公式推导的学习方法}
+%-----------------------
+%------  5-1     -------
+%-----------------------
+\subsection{强化学习模式}
+本文选择强化学习的方法来训练公式推导机，强化学习模式可以描述为，从要完成的任务提取一个enviroment，从中抽象出state 、action、以及执行该动作所接受的瞬时reward。强化学习的关键要素有：environment，reward，action 和 state。有了这些要素就能建立一个强化学习模型。强化学习解决的问题是，针对一个具体问题得到一个最优的policy，使得在该策略下获得的reward最大。所谓的policy其实就是一系列action，也就是sequential data。 
+
+本文使用Q-learning的学习模型\cite{ref_proc1}，Q-learning的学习模型需要不断更新一个名为Q-table的表，在这个表中，$Q(s,a)$代表在状态$s$时采取行动$a$所能获得的收益期望，而Q-learningd的学习过程就是通过更新算法求取这个表中的每一个值，即在任意状态$s$下采取行动$a$所能获得的收益期望。具体的更新方法是:
+
+$$Q(s,a)=R(s,a)+\gamma MAX_{a'}Q(s',a') $$
+
+通过训练数据的不断的更新，最终可以得到一个收敛的Q-table用于具体状态$s$时选择收益期望最大的行动$a$。而action可以被认为是使对象状态$s$变成$s'$的一种变换，可以表示成$a(s)=s'$。
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{qtable.jpg}
+\caption{Q-learning的基于状态的决策模式，每一对$(s,a)$在Q-table中有一个对应的Q-value量化在状态$s$时采取行动$a$的合理性，而Q-table是学习的目标参数。}
+\end{figure}
+
+%-----------------------
+%------  5-2     -------
+%-----------------------
+\subsection{强化学习模式用于自动公式推导}
+将强化学习模式用于解决自动公式推导问题时，环境的状态集合对应的是公式在推导的不同阶段的公式多叉树形态，agent可选择的action集合对应的是公式推导时可选择的所有基本模板映射集合，采取的action可以看做某个公式$F_t$按照模板映射$(T_{at},T_{bt})$的变换方法变换为公式$F_{t+1}$，也就是$R(F_t,(T_{at},T_{bt}))=F_{t+1}$。具体可以表示为：
+
+$$S={s1,s2...}={F1,F2...}$$
+
+$$A={a1,a2...}={(T_{a1},T_{b1}),(T_{a2},T_{b2})...}$$
+
+所以自动推导机需要在每一步计算决策概率$\pi_{\theta}(a|s)$，即根据现有状态$s$选择收益期望最大（也就是最能接近问题目标的）的action $a$的概率，再采取子树查找和替换算法实现一步公式推导。这个概率的具体形式：
+
+$$\pi_{\theta}(a|s)=\pi_{\theta}((T_{at},T_{bt})|F_t)$$
+
+本文采用神经网络模型和梯度下降法来实现$\pi_{\theta}(a|s)$的计算（事实上，这里可以用其他任何学习方法来求取这个概率，效果也许比神经网络好）。将公式多叉树$F_t$的特征向量作为输入，而输出则是可选择的action $a$的概率。
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{qnetwork.jpg}
+\caption{使用神经网络来学习基于状态的决策映射$\pi_{\theta}(a|s)$。输出的结果是在整个action空间的概率分布，选择的action是输出最大值对应的action。}
+\end{figure}
+
+%-----------------------
+%------  5-3     -------
+%-----------------------
+\subsection{公式推导训练}
+在学习开始前需要构造关于公式推导的训练集。训练集的输入元素是某时刻公式$F_t$，训练集的输出元素是当前公式$F_t$时，最佳的变换选择$(T_{at},T_{bt})$。即$(X,y)={F_t,(T_{at},T_{bt})}$。
+
+因此一个完整的公式推导实例可以分解为多个推导步骤，每一步都是一个训练样本，那么一个完整的公式推导可以转换为多个训练样本。一个完整的公式推导实例可以表示为：
+
+$$F_0 -(T_{a0},T_{b0})\to F_1 -...\to F_t -(T_{at},T_{bt})\to F_{t+1} -...$$
+
+对于某个物理方程速度的解的推导过程，可以表示为：
+
+$$mv^2/2+E=Q -(a+b=c,a=c-b)\to mv^2/2=Q-E -...\to $$
+$$v^2=2(Q-E)/m -(a^2=b,a=\sqrt b)\to v=\sqrt{ 2(Q-E)/m}-...$$
+
+具体的学习误差改进采用梯度下降法：
+
+$$\theta \leftarrow \theta - \epsilon \delta L(\pi_{\theta}(a|s),a^*)$$
+
+另外训练数据里，公式变换方式$a^*=(T_{at},T_{bt})$需要转化为one-hot模式，也就是$a^*=(0,0,0...1...0)$。
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{formula_network.jpg}
+\caption{使用神经网络来学习$\pi_{\theta}(a|s)$。输出的结果是采取每种公式变换的概率。}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+\section{问题实例}
+%-----------------------
+%------  6-1     -------
+%-----------------------
+现在要使用上述方法来解决一个实际的问题，求解反应堆物理中的$Pm^{149}$的浓度方程，这是一个一阶线性微分方程：
+
+$$dN_{Pm}(t)/dt = \gamma \sum \phi - \lambda N_{Pm}(t) $$
+
+首先需要构建关于一阶线性微分方程的公式推导训练集，一阶线性微分方程的形式是$dy/dx + P(x)y = Q(x) $，我们希望自动推导机不仅能解浓度方程，还能解决所有一阶线性微分方程。因此我们将$P(x) $和$Q(x) $看做一些函数的集合，也就是：
+
+$${P(x)_i}={a,ax,ax^2...ax^n...e^x,sinx...} \quad {Q(x)_i}={a,ax,ax^2...ax^n...e^x,sinx...} $$
+
+使用包含这些函数的方程推导实例来构建训练集$D={(X_i,y_i)}$，训练集的输入元素是某时刻公式$X_i=F_t$，训练集的输出元素是当公式是$F_t$时，最佳的变换选择$y_i=(T_{at},T_{bt})$，最终我们会通过训练集得到条件概率$\pi_{\theta}(a|s)=\pi_{\theta}(y|X)$来进行推导决策。
+
+在推导过程中，每次推导都会根据$\pi_{\theta}(a|s)$的值来评估下一步的模板选择，再根据子树匹配和替换算法进行公式多叉树的变换，然后再进行下一步的选择，直到得到符合最终目标公式多叉树形式的结果，才结束推导。
+
+$$dN_{Pm}(t)/dt = \gamma \sum \phi - \lambda N_{Pm}(t)    -(a/b=c,a=cb)\to    dN_{Pm}(t)=(\gamma \sum \phi - \lambda N_{Pm}(t))dt  -...\to   $$
+$$\int{1/(\gamma \sum \phi-\lambda N_{Pm}(t))}=\int{dt} -(S=\int{dt},S=t)\to  \int{1/(\gamma \sum \phi-\lambda N_{Pm}(t))}=t  -...\to  $$
+
+%-----------------------
+%------  6-4     -------
+%-----------------------
+
+
+%-----------table----------
+%\caption{在推导过程中，$\pi_{\theta}(a|s)$计算action时，正确的action和其他决策概率值相近的action的详细数据。}
+
+
+
+% \begin{figure}
+% \includegraphics[width=\textwidth]{fig1.eps}
+% \caption{A figure caption is always placed below the illustration.
+% Please note that short captions are centered, while long ones are
+% justified by the macro package automatically.} \label{fig1}
+% \end{figure}
+
+\begin{table}
+\caption{关于训练数据中公式中出现的算符的编码分配.}\label{tab1}
+\begin{tabular}{|l|l|l|}
+\hline
+Heading level &  公式算符编码 & Font size and style\\
+\hline
+Title (centered)  &  Text follows              &  14 point, bold\\
+1st-level heading & {$Sym/Num,+,-,\times,=,\int d,\sum,\phi,/,\sqrt,d, ln(), exp(), d/d$}  & 12 point, bold\\
+2nd-level heading & 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 & 10 point, bold\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{用于决策的神经网络.}\label{tab1}
+\begin{tabular}{|l|l|l|}
+\hline
+Heading level &  决策神经网络详情 & Font size and style\\
+\hline
+3rd-level heading & Relu $\to$ Relu $\to$ Relu $\to$ Softmax & 10 point, bold\\
+4th-level heading & 50   100  150  200  250  300 & 10 point, italic\\
+5th-level heading & 11.2 22.2 32.1 44.1 45.1 50.1 & 10 point, italic\\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+\section{讨论}
+为了得出能对各种专业科研领域的数学公式进行推导的自动推导机，首先我们将数学公式用多叉树的方式表达，并提出了公式多叉树的子树查找算法和替换算法，为了实现公式的迭代学习功能，我们定义了以简单公式映射模版为基础进行公式推导的实现方法，即只给出最简单基础的公式变换集合，通过公式多叉树的子树查找算法和替换算法使复杂公式遵从简单公式变换规则进行变换。为了度量公式的差异，并方便学习器学习公式的内涵模式，我们提出对公式多叉树进行编码的算法，将公式多叉树转化为特征向量。最后使用强化学习模式来构造神经网络，用梯度下降法训练网络根据当前公式状态进行正确变换的决策。
+
+虽然能推导出正确的答案，但是训练过程仍然很繁复，因为需要通过数据量要求大的神经网络训练，人为构造训练集是比较大的工程，而具体公式又是像微分方程这种比较复杂的内容，对训练数据制作者的要求也比一般机器学习数据制作者的要求高。所以应该考虑使用更智能的方式生成公式数据，比如按照某种规则编写用于训练的公式的构造函数，会更高效准确地获得训练数据。
+
+公式多叉树的编码方法也仍然存在缺陷，虽然本文的编码方式可以度量公式结构的相似性，但是无法度量计算符号间的相似性。本文的编码方法会判定$+$和$E(x,y)$的差异，$+$和$-$的差异是等价的，但实际上对于具体的问题，计算符号间的差异和内涵也有不同。类似word2vec \cite{ref_url1}的基于学习的编码方法会改善上述问题。
+
+本文的公式多叉树模型和公式自动推导机是对于科研自动化、智能化的初步研究，但是提出了比较高效的框架，用于将不同科研领域抽象的数学公式重新表达，并建立通用的决策模型来一步步推导。这样的学习框架可以用于更复杂更具有难度的科研交叉领域，人工需要完成的是设定基础的规则和模式，使用自动推导机可以进行比人为更高效的迭代学习和推导。我们希望自动推导机能在具体的科研领域取得有意义的推导成果。
+
+
+
+
+
+
+
+
+
+
+%
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+
+\bibliographystyle{splncs04}
+\bibliography{引用文献}
+
+\begin{thebibliography}{8}
+\bibitem{ref_article1}
+Author, F.: Article title. Journal \textbf{2}(5), 99--110 (2016)
+
+\bibitem{ref_lncs1}
+Author, F., Author, S.: Title of a proceedings paper. In: Editor,
+F., Editor, S. (eds.) CONFERENCE 2016, LNCS, vol. 9999, pp. 1--13.
+Springer, Heidelberg (2016). \doi{10.10007/1234567890}
+
+\bibitem{ref_book1}
+Author, F., Author, S., Author, T.: Book title. 2nd edn. Publisher,
+Location (1999)
+
+\bibitem{ref_proc1}
+Author, A.-B.: Contribution title. In: 9th International Proceedings
+on Proceedings, pp. 1--2. Publisher, Location (2010)
+
+\bibitem{ref_url1}
+LNCS Homepage, \url{http://www.springer.com/lncs}. Last accessed 4
+Oct 2017
+
+\end{thebibliography}
+
+
+% \bibliographystyle{plain}
+% \bibliography{my}
+
+
+\end{document}

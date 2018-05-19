@@ -4,6 +4,9 @@
 #include <map>
 #include <unistd.h>
 #include <queue>
+#include <stdio.h>  
+#include "Node.hpp"
+
 
 using namespace std;
 
@@ -65,12 +68,12 @@ bool DoseTree1HasTree2(Node* RootMain,Node* RootForm)
 		return false;
 	}
 
-	if (RootMain.type=="sym" && RootForm.type!="sym")
+	if (RootMain->type=="sym" && RootForm->type!="sym")
 	{
 		return false;
 	}
 
-	if (RootForm.type=="sym")
+	if (RootForm->type=="sym")
 	{
 		return true;
 	}
@@ -79,35 +82,12 @@ bool DoseTree1HasTree2(Node* RootMain,Node* RootForm)
 	
 	//if two nodes are both sym,before this step it has been returned true;
 	//if two nodes are both not sym,they have to have the same symbol;(Like num,comput symbol,function...)
-	bool result = RootMain.symbol && RootForm.symbol; 
+	bool result = (RootMain->symbol == RootForm->symbol); 
 	for (int i = 0; i < RootMain->subNodeNum; ++i)
 	{
 		result = result && DoseTree1HasTree2(RootMain->SubNodes[i],RootForm->SubNodes[i]);
 	}
 	return result;
-}
-
-
-//
-//================================================================================
-//====this is a comprehensive function:just like a reduce process...           ===
-//====RootMain   ---(replaceMap)---> RootMain(has been changed)                ===
-//====(1)find all sym nodes on template tree using help-stack;                 ===
-//====(2)replace the corresponding node on a copy of template tree;            ===
-//====(3)move the template tree replaced back into the origin main tree        ===
-//================================================================================
-//
-void changeLikeForm(const map<Sym,Node*> replaceMap,
-	                                 Node* RootMain,
-	                                 Node*    Start,
-	                              Node* ChangedForm)
-{
-	std::vector<ReplaceHelpInfo> HelpStack;
-	findSymOnForm2(ChangedForm,HelpStack);
-	//step 1
-	changeOnForm2(replaceMap,ChangedForm,HelpStack);
-	//step 2
-	replaceThatNode(RootMain,Start,ChangedForm);
 }
 
 
@@ -120,7 +100,38 @@ struct ReplaceHelpInfo
 {
 	Node* node;
 	unsigned          i;
+	ReplaceHelpInfo(Node* n,unsigned num)
+	{
+		node =   n;
+		i    = num;
+	}
 };
+
+
+
+//
+//================================================================================
+//====this is a comprehensive function:just like a reduce process...           ===
+//====RootMain   ---(replaceMap)---> RootMain(has been changed)                ===
+//====(1)find all sym nodes on template tree using help-stack;                 ===
+//====(2)replace the corresponding node on a copy of template tree;            ===
+//====(3)move the template tree replaced back into the origin main tree        ===
+//================================================================================
+//
+void changeLikeForm(const map<Node*,Node*> replaceMap,
+	                              Node*      RootMain,
+	                              Node*         Start,
+	                              Node*   ChangedForm)
+{
+	std::vector<ReplaceHelpInfo> HelpStack;
+	findSymOnForm2(ChangedForm,HelpStack);
+	//step 1
+	changeOnForm2(replaceMap,ChangedForm,HelpStack);
+	//step 2
+	replaceThatNode(RootMain,Start,ChangedForm);
+}
+
+
 
 
 //
@@ -137,7 +148,7 @@ void findSymOnForm2(Node*              ChangedForm,
 		{
 			for (int i = 0; i < ChangedForm->SubNodes.size(); ++i)
 			{
-				if (ChangedForm->SubNodes[i].type == "Sym")
+				if (ChangedForm->SubNodes[i]->type == "Sym")
 				{
 					HelpStack.push_back(ReplaceHelpInfo(ChangedForm,i));
 					continue;//"sym" type node must be leaf node,so...
@@ -153,7 +164,7 @@ void findSymOnForm2(Node*              ChangedForm,
 //=== the second step: make a copy of template tree,and change the corresponding node on it;  ===
 //===============================================================================================
 //
-void changeOnForm2(     const map<Sym,Node*>     replaceMap,
+void changeOnForm2(     const map<Node*,Node*>     replaceMap,
 	                                   Node*    ChangedForm,
 //	                                   Node* CopyOfTemplate,
 	            std::vector<ReplaceHelpInfo>      HelpStack)

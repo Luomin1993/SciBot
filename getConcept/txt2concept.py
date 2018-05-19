@@ -22,6 +22,7 @@ def getConcept(string):
     i        = 0
     for tag in tags:
         if tag[1] in readin_tags:
+	       #concept = concept + ' ' +tag[0]
            concept = concept + ' ' +tag[0]  
         #elif concept!='' and (tags[i-1][1] in end_tags):
         elif (tags[i-1][1] in end_tags) and concept.count(' ')>1:
@@ -48,6 +49,12 @@ def txt2concepts(path):
 def test_txt2concepts():
     print txt2concepts('./paper_example.txt')        
 
+#def concepts2txt(concepts_array,path):
+#    pass
+
+#def test_conceepts2txt():
+#    concepts_array = txt2concepts('./paper_example.txt')
+#	concepts2txt(concepts_array,'./concepts.txt')
 
 if __name__ == '__main__':
     #test_getConcept()
