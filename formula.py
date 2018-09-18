@@ -1,54 +1,108 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Created on Fri Sep 17 19:08:19 2017
+
+@author: Hanss401
+"""
+#/usr/local/lib/python2.7/dist-packages/sympy
+#np.random.randint(low=0, high=3)
+
+
+from __future__ import division;
 from sympy import *;
 import numpy as np;
-from Queue import Queue;
+init_printing(use_unicode=True)
 
-"""
-np.random.randint(low=0, high=3);
-"""
+'''
+def Sym(x):
+    return Node( Symbol(x) );
 
-class Node(object):
-    """Node in the Formula Graph"""
-    def __init__(self, sym_expr):
-        super(Node, self).__init__();
-        self.sym_expr = sym_expr; # sympy instance;
-        self.id  =  self.encode(self.sym_expr);
-        self.sub_node_ids = [encode(sub_expr) for sub_expr in self.sym_expr.args];
+def Add(x1,x2):
+    return Node( x1+x2 );
 
-    def encode(self,sym_expr):
-        queue_exprs = Queue();
-        queue_exprs.put(sym_expr);
-        encode = [];
-        while not queue_exprs.empty() :
-            now_expr = queue_exprs.get();
-            if len(now_expr.args)>0:
-                for sub_expr in now_expr.args:
-                    queue_exprs.put(sub_expr);
-            encode.append(now_expr.__class__.__name__);
-        return encode;
+def Sub(x1,x2):
+    return Node( x1-x2);
 
-class Graph(object):
-    """the Formula Graph"""
-    def __init__(self, id ):
-        super(Graph, self).__init__();
-        self.id = id;
-        self.Nodes = [];
+def Times(x1,x2):
+    return Node( x1*x2 );
 
-    def make_edges(self):
-        self.edges = [];
-        for i in range(len(self.graph)):    
-            for j in range(len(self.graph)):
-                if graph[j].id in graph[i].sub_node_ids:
-                    # which means an edge from node i to node j;
-                    edges.append((i,j));
-                    
+def Div(x1,x2):
+    return Node( x1/x2 );
+
+def Pow(x1,x2):
+    return Node( x1**x2);
+
+def Exp():    
+'''
+
+#=========== SET ================
+#OPT_SET_TWO     = ['Add','Mul','Pow']#,'Integral','Derivative'];
+#OPT_SET_ONE     = ['sin','cos','tan','exp'];
+OPT_SET_ONE     = [sin,cos,tan,exp];
+SYMBOL_VAR_SET  = ['x','y','z','k'];
+SYMBOL_FUNC_SET = ['f','g','m','n'];
+
+# #======= make dataset OLD===========
+
+# def make_random_int():
+#     x   = Symbol(SYMBOL_VAR_SET[ np.random.randint(low=1, high=len(SYMBOL_VAR_SET)) ]);
+#     f   = OPT_SET_ONE[ np.random.randint(low=1, high=len(OPT_SET_ONE)) ](x);
+#     return Integral(f,x);
+
+# def make_random_diff():
+#     x   = Symbol(SYMBOL_VAR_SET[ np.random.randint(low=1, high=len(SYMBOL_VAR_SET)) ]);
+#     f   = OPT_SET_ONE[ np.random.randint(low=1, high=len(OPT_SET_ONE)) ](x);
+#     return Derivative(f,x);
+
+# def make_random_poly():
+#     x   = Symbol(SYMBOL_VAR_SET[ np.random.randint(low=1, high=len(SYMBOL_VAR_SET)) ]);
+#     n   = np.random.randint(low=1, high=4);
+#     f   = (np.random.random()-0.5)*2000;
+#     for i in range(n):
+#         f += (np.random.random()-0.5)*200*Pow(x,np.random.randint(low=1, high=4));
+#     return f;    
+
+# def make_random_func():
+#     x = make_random_poly();
+#     f = OPT_SET_ONE[ np.random.randint(low=1, high=len(OPT_SET_ONE)) ](x);
+#     return f;    
+
+# def make_random_cat(x1,x2):
+#     n  = np.random.randint(low=1, high=4);
+#     if n==1:return x1+x2;
+#     if n==2:return x1-x2;
+#     if n==3:return x1*x2;
+#     if n==4:return -x1*x2;
 
 
+# class Sample_Der_Process(object):
+#     """A Sample_Der_Process"""
+#     def __init__(self):
+#         super(Sample_Der_Process, self).__init__()
+#         self.F_t = None;
+#         self.Processes = [];        
 
-#=============== make data =================
-SYM_SET_VAR  = ['y','z','a','b','u'];
-SYM_SET_FUNC = ['g','h','n','m','k', 'Env', 'Kar','Pt','Pm','Pr','Qam','Lamma','Y0'];
+# def make_a_sample():
+#     exec 'expr_r = '+OPT_SET_TWO[np.random.randint(low=1, high=len(OPT_SET_TWO))]+'(Symbol("'+ SYMBOL_VAR_SET[np.random.randint(low=1, high=len(SYMBOL_VAR_SET))] +'"),Symbol("'+ SYMBOL_VAR_SET[np.random.randint(low=1, high=len(SYMBOL_VAR_SET))] +'"))';
+#     # print expr_r;
+#     exec 'expr_l = '+OPT_SET_TWO[np.random.randint(low=1, high=len(OPT_SET_TWO))]+'(Symbol("'+ SYMBOL_VAR_SET[np.random.randint(low=1, high=len(SYMBOL_VAR_SET))] +'"),Symbol("'+ SYMBOL_VAR_SET[np.random.randint(low=1, high=len(SYMBOL_VAR_SET))] +'"))';
+#     # print expr_l;
+#     for i in range(5):
+#         exec 'expr_l = '+OPT_SET_TWO[np.random.randint(low=1, high=len(OPT_SET_TWO))]+'( '+OPT_SET_ONE[np.random.randint(low=1, high=len(OPT_SET_ONE))]+'(expr_l),Symbol("'+ SYMBOL_VAR_SET[np.random.randint(low=1, high=len(SYMBOL_VAR_SET))] +'"))';
+#         exec 'expr_r = '+OPT_SET_TWO[np.random.randint(low=1, high=len(OPT_SET_TWO))]+'( '+OPT_SET_ONE[np.random.randint(low=1, high=len(OPT_SET_ONE))]+'(expr_r),Symbol("'+ SYMBOL_VAR_SET[np.random.randint(low=1, high=len(SYMBOL_VAR_SET))] +'"))';
+#     #print srepr(Eq(expr_l,expr_r));    
+#     steps = [];
+#     while 1:
+#         steps.append(   Eq(expr_l,expr_r)  );
+#         res = next_step(expr_l,expr_r);
+#         if res==0:break;
+#         print str(res[0])+' = '+str(res[1]);
+#         (expr_l,expr_r) = res;
+#     for step in steps:print step;    
+
+#===== make dataset ===========
+SYM_SET_VAR  = ['x','y','z','a','b','u'];
+SYM_SET_FUNC = ['f','g','Ho','Nt','Ms','KL', 'Env', 'Kar','Pt','Pm','Pr','Qam','Lamma','Y0'];
 OPT_SET_ONE  = ['exp','sin','cos','exp','gamma'];
 OPT_SET_TWO  = ['diff','integrate','','exp','gamma'];
 
@@ -97,53 +151,76 @@ def make_random_eq(n):
         if m%3==0: f1=make_random_sym_func();f2=make_random_sym_func();lhs  = f1(lhs);rhs  = f1(lhs);
     return Eq(lhs,rhs);
 
-def make_random_diff_eq():
-    f = Function('f');
-    x = Symbol('x');
-    forward_0 = make_random_sym_var()*make_random_sym_func()(make_random_sym_var());
-    forward_1 = make_random_sym_var()*make_random_sym_func()(make_random_sym_var());
-    forward_2 = make_random_sym_var()*make_random_sym_func()(make_random_sym_var());
-    lhs = forward_2*f(x).diff(x, x) + forward_1*f(x).diff(x) + forward_0*f(x);
-    rhs = make_random_sym_var()**np.random.randint(low=0,high=3)*make_random_sym_func()(x);
-    diffeq = Eq(lhs,rhs);
-    #return dsolve(diffeq,f(x));
-    return diffeq,dsolve(diffeq,f(x));
 
-def make_to_file():
-    f = open('data.fm','w');
-    for i in range(50):
-        print float(i)/50;
-        f.write( '------------------\n');
-        diffeq,solveeq=make_random_diff_eq();
-        f.write(srepr(diffeq) +'\n');
-        f.write(srepr(solveeq) +'\n');
-    f.close();
 
-def F2G(F_s):
-    queue_exprs = Queue();
-    F_s=F_s.replace('\'','"');
-    exec 'F ='+F_s;
-    queue_exprs.put(F);
-    #self.__class__.__name__;self.name;
-    #print make_random_sym_func().__name__;
-    graph = [];
-    while not queue_exprs.empty() :
-        now_expr = queue_exprs.get();
-        if len(now_expr.args)>0:
-            for sub_expr in now_expr.args:
-                queue_exprs.put(sub_expr);
-        #print now_expr.__class__.__name__;
-        new_node = Node(now_expr);
-        if new_node.id not in graph: graph.append(new_node.id);
-    print len(graph);
+#===== data structure ==================
+
+class Node(object):
+    """Node in the Graph"""
+    def __init__(self, sym):
+        super(Node, self).__init__()
+        self.id       = 0;
+        self.sym      = sym;    
+        self.subNodes = [];
+        #self.func     = Sym;
+
+
+class Graph(object):
+    """the Formula Graph"""
+    def __init__(self, id):
+        super(Graph, self).__init__()
+        self.id    = id;
+        self.Nodes = [];
+        self.exp   = [];
+
+#======== helper functions ==========
+def next_step(expr_l,expr_r):
+    while len(expr_r.args)>=2:
+        if len(expr_r.args[1].args)>len(expr_r.args[0].args) : 
+            expr_l = solveset(Eq(expr_l, expr_r), expr_r.args[1]).args[0];
+            return (expr_l,expr_r.args[1]);
+        else : 
+            expr_l = solveset(Eq(expr_l, expr_r), expr_r.args[0]).args[0];
+            return (expr_l,expr_r.args[0]);
+    return 0;
+
+    
+
+#======= TEST ============
+def test_next_step(Fe):
+    expr_l = Fe.args[0];
+    expr_r = Fe.args[1];
+    i=10;
+    while i>0:
+        print Fe;
+        Fe = next_step(expr_l,expr_r);
+        if Fe==0:break;
+        print str(Fe[0])+' = '+str(Fe[1]);
+        (expr_l,expr_r) = Fe;
+        i-=1;
+
+
+def test_solve_one():
+	#ConditionSet(b, Eq(Pm(b) - Y0(Pr(a)), 0), Reals)
+    a,b      = symbols('a b',real=True);
+    Pm,Y0,Pr = symbols('Pm Y0 Pr',cls=Function);
+    lhs = Pm(b);
+    rhs = Y0(Pr(a));
+    Fe = Eq(lhs,rhs);
+    #print lhs.args;
+    return solveset(Fe,b,domain=S.Reals);
+
+
 
 if __name__ == '__main__':
-    #print make_random_poly(make_random_sym_var());
-    #print make_random_sym_var().__class__.__name__;
-    #print make_random_sym_var().name;
-    #print make_random_sym_func().__name__;
+    #exec 'print Mul(Symbol(\'a\'), Symbol(\'y\'))';
+    #exec 'print Mul(Symbol("a"), Symbol("y"))';        
+    #test_next_step();
+    #make_a_sample();
+    #print make_random_int();
+    #print make_random_func();
+    #print make_random_diff();
+    #print make_random_cat(make_random_func(),make_random_func());
     #print make_random_eq(3);
-    #for i in range(5):print make_random_diff_eq();
-    #make_to_file();
-    #print F2G(srepr(make_random_diff_eq()[0]));
-    F2G("Add(Mul(Integer(-1), Pow(Symbol('x'), Integer(2))), Mul(Rational(1, 2),sin(Mul(Symbol('x'), Symbol('y')))), Pow(Symbol('y'), Integer(-1)))");
+    #test_next_step(make_random_eq(3));
+    print test_solve_one().args[0];
