@@ -6,3 +6,6 @@ is under the root folder;
 
 ### The code about the paper: "CAG"
 is in the folder CAG;
+
+### The code about the paper: "Neural-Symbolic"
+is in the root folder;
