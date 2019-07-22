@@ -86,12 +86,23 @@ class FormulaGraph(object):
     def link_symbol(self):
         pass;                
 
+    def is_full(self):
+        turple_num = 0;
+        pow_num    = 0;
+        for i in range(len(self.Graph)):
+            for j in self.Graph[i]:
+                turple_num +=1;                
+            #pow_num += 2**i;    
+        for i in range(self.deepth):
+            pow_num += 2**i;    
+        return turple_num == pow_num;     
+
     def random_construct_graph(self):
-        num_opt = np.random.randint(3)+3;
-        num_sym = np.random.randint(3)+3;
+        num_opt = np.random.randint(4)+3;
+        num_sym = np.random.randint(4)+3;
         this_level = 0;
-        secure_infine_circle = 50;
-        while num_opt > 0 or num_sym > 0:
+        secure_infine_circle = 70;
+        while not(self.is_full()):
         	# if it's the root;
             if len(self.Graph) == 0:
                 self.Graph.append( [Node(attr='root', string=OPT[np.random.randint(len(OPT))], code=0, level=0,opt_num=np.random.randint(2)+1,ID=(0,0)) ] );
@@ -101,7 +112,7 @@ class FormulaGraph(object):
                 continue;
             # judge if the level needs change;
             if len(self.Graph[-1])>0 and len(self.Graph[-1]) == 2**(len(self.Graph)-1):
-                #print(str(len(self.Graph[-1])) + ' : ' + str(2**(len(self.Graph))))
+                # print(str(len(self.Graph[-1])) + ' : ' + str(2**(len(self.Graph))))
                 this_level += 1;
                 if this_level>self.deepth:break;
                 self.Graph.append([]);
@@ -121,20 +132,45 @@ class FormulaGraph(object):
                     this_node.opt_num = np.random.randint(2)+1;
                     this_node.ID = (this_level,len(self.Graph[-1]));
                     num_opt -=1;    
+                # preventing the last layer is opt;
+                if this_level==self.deepth and this_node.attr=='opt':
+                    continue;
                 # get the choice but no more num...
                 if (this_node.attr=='sym' and num_sym==0 and num_opt>0) or (this_node.attr=='opt' and num_opt==0 and num_sym>0):
                     continue;
+
             # link this node to the right prev node:
             for i in range( len(self.Graph[-2]) ):
                 # Link/Add the constructed node into Graph:
                 if self.Graph[-2][i].opt_num>0 and self.Graph[-2][i].opt_num>len(self.Graph[-2][i].next):
                     self.Graph[-2][i].next.append(this_node.ID);
                     self.Graph[-1].append(this_node);
+                    continue;
                 # Link/Add the dummy node into Graph:
                 if 2 > len(self.Graph[-2][i].next) and self.Graph[-2][i].opt_num==len(self.Graph[-2][i].next):
                     dummy_node = Node(attr='dummy',opt_num=0,ID = (this_level,len(self.Graph[-1])) );
                     self.Graph[-2][i].next.append(dummy_node.ID);
                     self.Graph[-1].append(dummy_node);
+            """
+
+            # link this node to the right prev node:
+            if len(self.Graph[-1]) < 2**(this_level-1):
+                # find which node's next_arr is not full:
+                find_one = 0;
+                for i in range( len(self.Graph[-2]) ):
+                	# Link/Add the constructed node into Graph:
+                    if self.Graph[-2][i].opt_num>0 and self.Graph[-2][i].opt_num>len(self.Graph[-2][i].next):
+                        self.Graph[-2][i].next.append(this_node.ID);
+                        self.Graph[-1].append(this_node);
+                        find_one =1;
+                    # Link/Add the dummy node into Graph:
+                    if 2 > len(self.Graph[-2][i].next) and self.Graph[-2][i].opt_num==len(self.Graph[-2][i].next):
+                        dummy_node = Node(attr='dummy',opt_num=0,ID = (this_level,len(self.Graph[-1])) );
+                        self.Graph[-2][i].next.append(dummy_node.ID);
+                        self.Graph[-1].append(dummy_node);
+                        find_one =1;
+                    if find_one:break;    
+            """        
             # Prevent falling into an infinite cycle;
             secure_infine_circle -= 1;
             if secure_infine_circle==0:break;
@@ -146,7 +182,7 @@ class FormulaGraph(object):
 
 # -------------- T E S T -----------------
 if __name__ == '__main__':
-    gg = FormulaGraph(4);
+    gg = FormulaGraph(3);
     gg.random_construct_graph();
     #gg.draw();
     gg.print_as_array();
