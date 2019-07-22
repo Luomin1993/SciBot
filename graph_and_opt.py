@@ -64,10 +64,21 @@ class FormulaGraph(object):
     
     def draw(self):
         for level_nodes in self.Graph:
+            #print(len(level_nodes));
             for node in level_nodes:
-                print(node.string+' ');
+                print(node.string+' ',end=' ');
+            print('\n');
             for node in level_nodes:
-                print(' '+'|');    
+                print(' '+'|',end=' ');    
+            print('\n');
+
+    def print_as_array(self):
+        arr = [];
+        for level_nodes in self.Graph:
+            arr.append([]);
+            for node in level_nodes:
+                arr[-1].append(node.string);
+        print(arr);        
 
     def construct_graph(self):
         pass;
@@ -79,34 +90,40 @@ class FormulaGraph(object):
         num_opt = np.random.randint(3)+3;
         num_sym = np.random.randint(3)+3;
         this_level = 0;
-        while num_opt!=0 and num_sym != 0:
+        secure_infine_circle = 50;
+        while num_opt > 0 or num_sym > 0:
+        	# if it's the root;
             if len(self.Graph) == 0:
-                self.Graph.append( [Node(attr='root', string=OPT[np.random.randint(len(OPT))], code=0, level=0,opt_num=np.random.randint(1)+1,ID=(0,0)) ] );
+                self.Graph.append( [Node(attr='root', string=OPT[np.random.randint(len(OPT))], code=0, level=0,opt_num=np.random.randint(2)+1,ID=(0,0)) ] );
                 num_opt -=1;
                 this_level += 1;
                 self.Graph.append([]);
                 continue;
             # judge if the level needs change;
-            if len(self.Graph[-1]) == 2**len(self.Graph):
+            if len(self.Graph[-1])>0 and len(self.Graph[-1]) == 2**(len(self.Graph)-1):
+                #print(str(len(self.Graph[-1])) + ' : ' + str(2**(len(self.Graph))))
                 this_level += 1;
                 if this_level>self.deepth:break;
                 self.Graph.append([]);
                 continue;
             # decide this node is sym/opt/...
-            if num_opt>0 and num_sym>0:
-                this_node = Node(attr=ATTR[np.random.randint(1)]);
-                if this_node.attr=='sym':
+            if num_opt>0 or num_sym>0:
+                this_node = Node(attr=ATTR[np.random.randint(2)]);
+                if this_node.attr=='sym' and num_sym>0:
                     this_node.string  = SYM[np.random.randint(len(SYM))];
                     this_node.level   = this_level;
                     this_node.opt_num = 0;
                     this_node.ID = (this_level,len(self.Graph[-1]));
                     num_sym -=1;
-                if this_node.attr=='opt':
+                if this_node.attr=='opt' and num_opt>0:
                     this_node.string  = OPT[np.random.randint(len(OPT))];
                     this_node.level   = this_level;
-                    this_node.opt_num = np.random.randint(1)+1;
+                    this_node.opt_num = np.random.randint(2)+1;
                     this_node.ID = (this_level,len(self.Graph[-1]));
                     num_opt -=1;    
+                # get the choice but no more num...
+                if (this_node.attr=='sym' and num_sym==0 and num_opt>0) or (this_node.attr=='opt' and num_opt==0 and num_sym>0):
+                    continue;
             # link this node to the right prev node:
             for i in range( len(self.Graph[-2]) ):
                 # Link/Add the constructed node into Graph:
@@ -114,13 +131,22 @@ class FormulaGraph(object):
                     self.Graph[-2][i].next.append(this_node.ID);
                     self.Graph[-1].append(this_node);
                 # Link/Add the dummy node into Graph:
-                if self.Graph[-2][i].opt_num>0 and self.Graph[-2][i].opt_num>len(self.Graph[-2][i].next):
-                    dummy_node = Node(attr='dummy',ID = (this_level,len(self.Graph[-1])) );
+                if 2 > len(self.Graph[-2][i].next) and self.Graph[-2][i].opt_num==len(self.Graph[-2][i].next):
+                    dummy_node = Node(attr='dummy',opt_num=0,ID = (this_level,len(self.Graph[-1])) );
                     self.Graph[-2][i].next.append(dummy_node.ID);
                     self.Graph[-1].append(dummy_node);
+            # Prevent falling into an infinite cycle;
+            secure_infine_circle -= 1;
+            if secure_infine_circle==0:break;
+
+    def change_by_code(self,opt_code):
+        pass;
+
+
 
 # -------------- T E S T -----------------
 if __name__ == '__main__':
-    gg = FormulaGraph(3);
+    gg = FormulaGraph(4);
     gg.random_construct_graph();
-    gg.draw();
+    #gg.draw();
+    gg.print_as_array();
